@@ -73,7 +73,7 @@ export class CoursesService {
       await this.courseRepository.softDelete(id);
       return { message: 'Curso removido com sucesso.' };
     } catch (error) {
-      throw new HttpException({ message: 'Não foi possível deletar o curso' }, HttpStatus.BAD_REQUEST);
+      throw new HttpException({ message: 'Não foi possível excluir o curso' }, HttpStatus.BAD_REQUEST);
     }
   }
 }

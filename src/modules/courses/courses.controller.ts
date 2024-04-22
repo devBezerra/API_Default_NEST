@@ -4,6 +4,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseInterface } from './interfaces/course.interface';
 import { CourseIdExistPipe } from './pipes/course-id-exists.pipe';
+import { StudentsExistInCoursePipe } from './pipes/course-students-exists.pipe';
 
 //Docs
 import { ApiTags } from '@nestjs/swagger';
@@ -47,7 +48,9 @@ export class CoursesController {
 
   @DeleteCourseDocs()
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe, CourseIdExistPipe) id: number): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseIntPipe, CourseIdExistPipe, StudentsExistInCoursePipe) id: number,
+  ): Promise<{ message: string }> {
     return this.coursesService.remove(+id);
   }
 }
