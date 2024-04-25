@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Bezerras Code')
-    .setDescription('API criada para teste de squad web')
+    .setDescription('API criada para documentação de processo de criação com NESTJS')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
