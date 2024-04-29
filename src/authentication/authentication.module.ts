@@ -11,7 +11,7 @@ import { PassportModule } from '@nestjs/passport';
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'asdf',
+      secret: process.env.API_SECRET,
       signOptions: {
         expiresIn: '1d',
         algorithm: 'HS384',
