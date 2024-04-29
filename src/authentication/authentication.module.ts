@@ -3,24 +3,25 @@ import { Module } from '@nestjs/common';
 import { AuthenticationController } from './authentication.controller';
 import { AuthenticationService } from './authentication.service';
 import { UsersModule } from 'src/modules/users/users.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from 'src/providers/authentication/jwt.strategy';
-import { jwtConstants } from './constants';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: jwtConstants.secret,
-      // secretOrPrivateKey: 'yagsdyutwafwdayuisdwadaw',
+      secret: 'asdf',
       signOptions: {
-        expiresIn: '300s',
+        expiresIn: '1d',
+        algorithm: 'HS384',
+      },
+      verifyOptions: {
+        algorithms: ['HS384'],
       },
     }),
   ],
   controllers: [AuthenticationController],
-  providers: [JwtStrategy, AuthenticationService, JwtService, JwtModule],
+  providers: [AuthenticationService],
 })
 export class AuthenticationModule {}
