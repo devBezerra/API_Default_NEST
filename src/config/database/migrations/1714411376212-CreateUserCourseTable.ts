@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
 
-export class CreateStudentCourseTable1713788426964 implements MigrationInterface {
-  private studentCourseTable = new Table({
-    name: 'students_courses',
+export class CreateuserCourseTable1714146582725 implements MigrationInterface {
+  private userCourseTable = new Table({
+    name: 'users_courses',
     columns: [
       {
         name: 'id',
@@ -12,7 +12,7 @@ export class CreateStudentCourseTable1713788426964 implements MigrationInterface
         generationStrategy: 'increment',
       },
       {
-        name: 'student_id',
+        name: 'user_id',
         type: 'INTEGER',
       },
       {
@@ -22,16 +22,16 @@ export class CreateStudentCourseTable1713788426964 implements MigrationInterface
     ],
   });
 
-  private studentIdForeignKey = new TableForeignKey({
-    name: 'fk_students_courses_student_id',
-    columnNames: ['student_id'],
+  private userIdForeignKey = new TableForeignKey({
+    name: 'fk_users_courses_user_id',
+    columnNames: ['user_id'],
     referencedColumnNames: ['id'],
-    referencedTableName: 'students',
+    referencedTableName: 'users',
     onDelete: 'CASCADE',
   });
 
   private courseIdForeignKey = new TableForeignKey({
-    name: 'fk_students_courses_course_id',
+    name: 'fk_users_courses_course_id',
     columnNames: ['course_id'],
     referencedColumnNames: ['id'],
     referencedTableName: 'courses',
@@ -39,12 +39,12 @@ export class CreateStudentCourseTable1713788426964 implements MigrationInterface
   });
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.createTable(this.studentCourseTable);
-    await queryRunner.createForeignKeys('students_courses', [this.studentIdForeignKey, this.courseIdForeignKey]);
+    await queryRunner.createTable(this.userCourseTable);
+    await queryRunner.createForeignKeys('users_courses', [this.userIdForeignKey, this.courseIdForeignKey]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKeys('students_courses', [this.studentIdForeignKey, this.courseIdForeignKey]);
-    await queryRunner.dropTable(this.studentCourseTable);
+    await queryRunner.dropForeignKeys('users_courses', [this.userIdForeignKey, this.courseIdForeignKey]);
+    await queryRunner.dropTable(this.userCourseTable);
   }
 }

@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreateStudentsTable1713743901361 implements MigrationInterface {
-  private StudentsTable = new Table({
-    name: 'students',
+export class CreateRolesTable1714411376210 implements MigrationInterface {
+  private RolesTable = new Table({
+    name: 'roles',
     columns: [
       {
         name: 'id',
@@ -14,8 +14,8 @@ export class CreateStudentsTable1713743901361 implements MigrationInterface {
       {
         name: 'name',
         type: 'VARCHAR',
-        length: '50',
-        isNullable: false,
+        length: '255',
+        isUnique: true,
       },
       {
         name: 'created_at',
@@ -34,11 +34,12 @@ export class CreateStudentsTable1713743901361 implements MigrationInterface {
       },
     ],
   });
+
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.createTable(this.StudentsTable);
+    await queryRunner.createTable(this.RolesTable);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(this.StudentsTable);
+    await queryRunner.dropTable(this.RolesTable);
   }
 }

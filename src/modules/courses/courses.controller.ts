@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseInterface } from './interfaces/course.interface';
-import { CourseIdExistPipe } from './pipes/course-id-exists.pipe';
-import { StudentsExistInCoursePipe } from './pipes/course-students-exists.pipe';
+// import { CourseIdExistPipe } from './pipes/course-id-exists.pipe';
+// import { StudentsExistInCoursePipe } from './pipes/course-students-exists.pipe';
 
 //Docs
 import { ApiTags } from '@nestjs/swagger';
@@ -41,7 +41,7 @@ export class CoursesController {
   @Patch(':id')
   async update(
     @Body() data: UpdateCourseDto,
-    @Param('id', ParseIntPipe, CourseIdExistPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<{ course: CourseInterface; message: string }> {
     return this.coursesService.update(+id, data);
   }
@@ -49,7 +49,7 @@ export class CoursesController {
   @DeleteCourseDocs()
   @Delete(':id')
   async remove(
-    @Param('id', ParseIntPipe, CourseIdExistPipe, StudentsExistInCoursePipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<{ message: string }> {
     return this.coursesService.remove(+id);
   }

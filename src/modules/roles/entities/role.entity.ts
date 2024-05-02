@@ -1,4 +1,4 @@
-import { CourseEntity } from 'src/modules/courses/entities/course.entity';
+import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,27 +10,27 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'students' })
-export class StudentEntity {
+@Entity({ name: 'roles' })
+export class RoleEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @ManyToMany(() => CourseEntity)
+  @ManyToMany(() => UserEntity)
   @JoinTable({
-    name: 'students_courses',
+    name: 'users_roles',
     joinColumn: {
-      name: 'student_id',
+      name: 'user_id',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'course_id',
+      name: 'role_id',
       referencedColumnName: 'id',
     },
   })
-  courses: CourseEntity[];
+  users: UserEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;

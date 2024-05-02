@@ -1,11 +1,12 @@
-import { StudentEntity } from 'src/modules/students/entities/student.entity';
+import { CourseEntity } from 'src/modules/courses/entities/course.entity';
+import { RoleEntity } from 'src/modules/roles/entities/role.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
-  OneToOne,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -24,9 +25,33 @@ export class UserEntity {
   @Column({ select: false })
   password?: string;
 
-  @OneToOne(() => StudentEntity)
-  @JoinColumn({ name: 'student_id' })
-  student: StudentEntity;
+  @ManyToMany(() => RoleEntity)
+  @JoinTable({
+    name: 'users_roles',
+    joinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+  })
+  roles?: RoleEntity[];
+
+  @ManyToMany(() => CourseEntity)
+  @JoinTable({
+    name: 'users_courses',
+    joinColumn: {
+      name: 'course_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+  })
+  courses: CourseEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;

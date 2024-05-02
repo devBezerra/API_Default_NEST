@@ -1,4 +1,4 @@
-import { StudentEntity } from 'src/modules/students/entities/student.entity';
+import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -21,20 +21,19 @@ export class CourseEntity {
   @Column()
   syllabus: string;
 
-  @ManyToMany(() => StudentEntity)
+  @ManyToMany(() => UserEntity)
   @JoinTable({
-    name: 'students_courses',
-
+    name: 'users_courses',
     joinColumn: {
       name: 'course_id',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'student_id',
+      name: 'user_id',
       referencedColumnName: 'id',
     },
   })
-  students: StudentEntity[];
+  users: UserEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
