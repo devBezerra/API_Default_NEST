@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
 
-export class CreateuserCourseTable1714146582725 implements MigrationInterface {
-  private userCourseTable = new Table({
-    name: 'users_courses',
+export class CreateRegistrationTable1714146582725 implements MigrationInterface {
+  private RegistrationTable = new Table({
+    name: 'registrations',
     columns: [
       {
         name: 'id',
@@ -19,11 +19,26 @@ export class CreateuserCourseTable1714146582725 implements MigrationInterface {
         name: 'course_id',
         type: 'INTEGER',
       },
+      {
+        name: 'created_at',
+        type: 'TIMESTAMP',
+        default: 'NOW()',
+      },
+      {
+        name: 'updated_at',
+        type: 'TIMESTAMP',
+        default: 'NOW() ON UPDATE CURRENT_TIMESTAMP()',
+      },
+      {
+        name: 'deleted_at',
+        type: 'TIMESTAMP',
+        isNullable: true,
+      },
     ],
   });
 
   private userIdForeignKey = new TableForeignKey({
-    name: 'fk_users_courses_user_id',
+    name: 'fk_registrations_user_id',
     columnNames: ['user_id'],
     referencedColumnNames: ['id'],
     referencedTableName: 'users',
@@ -31,7 +46,7 @@ export class CreateuserCourseTable1714146582725 implements MigrationInterface {
   });
 
   private courseIdForeignKey = new TableForeignKey({
-    name: 'fk_users_courses_course_id',
+    name: 'fk_registrations_course_id',
     columnNames: ['course_id'],
     referencedColumnNames: ['id'],
     referencedTableName: 'courses',
@@ -39,12 +54,12 @@ export class CreateuserCourseTable1714146582725 implements MigrationInterface {
   });
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.createTable(this.userCourseTable);
-    await queryRunner.createForeignKeys('users_courses', [this.userIdForeignKey, this.courseIdForeignKey]);
+    await queryRunner.createTable(this.RegistrationTable);
+    await queryRunner.createForeignKeys('registrations', [this.userIdForeignKey, this.courseIdForeignKey]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKeys('users_courses', [this.userIdForeignKey, this.courseIdForeignKey]);
-    await queryRunner.dropTable(this.userCourseTable);
+    await queryRunner.dropForeignKeys('registrations', [this.userIdForeignKey, this.courseIdForeignKey]);
+    await queryRunner.dropTable(this.RegistrationTable);
   }
 }

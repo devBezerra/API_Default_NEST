@@ -23,6 +23,11 @@ export class CreateTableCourses1713543882233 implements MigrationInterface {
         isNullable: true,
       },
       {
+        name: 'user_id',
+        type: 'INTEGER',
+        isNullable: false,
+      },
+      {
         name: 'created_at',
         type: 'TIMESTAMP',
         default: 'NOW()',

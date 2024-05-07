@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Injectable()
 export class UsersService {
@@ -30,7 +29,7 @@ export class UsersService {
     try {
       const user = await this.usersRepository.findOneOrFail({
         where: { id },
-        relations: ['roles'],
+        relations: ['roles', 'courses', 'registrations'],
       });
       return user;
     } catch (error) {

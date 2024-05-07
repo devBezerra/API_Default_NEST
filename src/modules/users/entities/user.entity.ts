@@ -1,4 +1,5 @@
 import { CourseEntity } from 'src/modules/courses/entities/course.entity';
+import { RegistrationEntity } from 'src/modules/registration/entities/registration.entity';
 import { RoleEntity } from 'src/modules/roles/entities/role.entity';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -39,19 +41,11 @@ export class UserEntity {
   })
   roles?: RoleEntity[];
 
-  @ManyToMany(() => CourseEntity)
-  @JoinTable({
-    name: 'users_courses',
-    joinColumn: {
-      name: 'course_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-  })
-  courses: CourseEntity[];
+  @OneToMany(() => CourseEntity, (course) => course.user)
+  courses?: CourseEntity[];
+
+  @OneToMany(() => RegistrationEntity, (registration) => registration.user)
+  registrations?: RegistrationEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
