@@ -5,6 +5,7 @@ import { UserInterface } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -16,21 +17,54 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<UserInterface[]> {
+    try {
+      return await this.usersRepository.find();
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar os usuários.' }, HttpStatus.NOT_FOUND);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<UserInterface> {
+    try {
+      const user = await this.usersRepository.findOneOrFail({
+        where: { id },
+        relations: ['roles', 'courses', 'registrations'],
+      });
+      return user;
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
+    }
   }
 
   async findUserByEmailLogin(email: string): Promise<UserInterface> {
     try {
       const user = await this.usersRepository.findOneOrFail({
         where: { email, deletedAt: null },
+        relations: ['roles'],
       });
 
       return user;
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async findUserRoles(id: number): Promise<UserInterface> {
+    try {
+      const user = await this.usersRepository.findOneOrFail({
+        where: { id },
+        relations: ['roles'],
+      });
+      return user;
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async getMe(user: AuthUserInterface): Promise<UserInterface> {
+    try {
+      return await this.findOne(user.id);
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
     }
@@ -46,7 +80,7 @@ export class UsersService {
         throw new UnauthorizedException('Estas credenciais estão incorretas.');
       }
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 

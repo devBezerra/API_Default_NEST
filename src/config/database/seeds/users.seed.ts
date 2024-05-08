@@ -11,6 +11,21 @@ export class UsersSeed implements Seeder {
                 username: 'Administrador',
                 email: 'admin@admin.com',
                 password: '12345',
+                roles: []
+            },
+            {
+                id: 2,
+                username: 'Nathanzinho LTDA',
+                email: 'nathan@nathan.com',
+                password: '12345',
+                roles:[]
+            },
+            {
+                id: 3,
+                username: 'Arthurzinho',
+                email: 'arthur@arthur.com',
+                password: '12345',
+                roles: []
             }
         ])
     }

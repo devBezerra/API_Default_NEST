@@ -17,9 +17,9 @@ export class StudentsExistInCoursePipe implements PipeTransform<any> {
         relations: ['students'] 
     });
 
-    if (!!course.students.length) {
-      throw new HttpException({ message: `Existem alunos matriculados a esse curso.` }, HttpStatus.BAD_REQUEST);
-    }
+    // if (!!course.students.length) {
+    //   throw new HttpException({ message: `Existem alunos matriculados a esse curso.` }, HttpStatus.BAD_REQUEST);
+    // }
 
     return id;
   }

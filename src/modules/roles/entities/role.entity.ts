@@ -4,29 +4,33 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'courses' })
-export class CourseEntity {
+@Entity({ name: 'roles' })
+export class RoleEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  description: string;
+  name: string;
 
-  @Column()
-  syllabus: string;
-
-  @Column({ name: 'user_id' })
-  userId: number;
-
-  @ManyToOne(() => UserEntity, (user) => user.courses)
-  @JoinColumn({ name: 'user_id' })
-  user?: UserEntity;
+  @ManyToMany(() => UserEntity)
+  @JoinTable({
+    name: 'users_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id',
+    },
+  })
+  users: UserEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;

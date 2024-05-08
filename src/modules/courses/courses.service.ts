@@ -23,7 +23,10 @@ export class CoursesService {
 
   async findOne(id: number): Promise<CourseInterface> {
     try {
-      return await this.courseRepository.findOneOrFail({ where: { id } });
+      return await this.courseRepository.findOneOrFail({
+        where: { id },
+        relations: ['user'],
+      });
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar o curso.' }, HttpStatus.NOT_FOUND);
     }

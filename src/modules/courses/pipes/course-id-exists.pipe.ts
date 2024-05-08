@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable, NotFoundException, PipeTransform
 import { InjectRepository } from '@nestjs/typeorm';
 import { CourseEntity } from '../entities/course.entity';
 import { Repository } from 'typeorm';
-import { StudentInterface } from 'src/modules/students/interfaces/student.interface';
 
 @Injectable()
 export class CourseIdExistPipe implements PipeTransform<any> {
@@ -20,7 +19,7 @@ export class CourseIdExistPipe implements PipeTransform<any> {
     }
   }
 
-  async transform(argument: number | StudentInterface): Promise<any> {
+  async transform(argument: number): Promise<any> {
     if (typeof argument === 'number') {
       const course = await this.checkRepository(argument);
       if (!course) {
@@ -29,13 +28,6 @@ export class CourseIdExistPipe implements PipeTransform<any> {
           `Não foi possível encontrar um curso com esse I: ${argument}`,
         );
       }
-      return argument;
-    } else {
-      const promises = argument.courses.map((course) => {
-        return this.checkRepository(course.id);
-      });
-
-      await Promise.all(promises);
       return argument;
     }
   }
