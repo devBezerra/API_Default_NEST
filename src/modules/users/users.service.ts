@@ -4,18 +4,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserInterface } from './interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
+import { CheckRole } from 'src/shared/utils/check-role.util';
+import { UserWithPasswordsInterface } from './interfaces/user-with-password.interface';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    private checkRole: CheckRole,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
 
   async findAll(): Promise<UserInterface[]> {
     try {
@@ -27,11 +27,30 @@ export class UsersService {
 
   async findOne(id: number): Promise<UserInterface> {
     try {
-      const user = await this.usersRepository.findOneOrFail({
-        where: { id },
-        relations: ['roles', 'courses', 'registrations'],
-      });
+      const entitie = this.usersRepository
+        .createQueryBuilder('u')
+        .select(['u', 'c.id', 'c.description', 'rg.id', 'rgc.id', 'rgc.description'])
+        .leftJoin('u.courses', 'c', 'c.user_id = u.id')
+        .leftJoin('u.registrations', 'rg', 'rg.user_id = u.id')
+        .leftJoin('rg.course', 'rgc', 'rg.course_id = rgc.id')
+        .where('u.id = :id', { id });
+
+      const user: UserInterface = await entitie.getOneOrFail();
       return user;
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async findUserByEmail(email: string, user: UserInterface): Promise<UserInterface> {
+    try {
+      const id = user.id || 0;
+      return await this.usersRepository.findOne({
+        where: {
+          email,
+          id: Not(id),
+        },
+      });
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
     }
@@ -44,18 +63,6 @@ export class UsersService {
         relations: ['roles'],
       });
 
-      return user;
-    } catch (error) {
-      throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
-    }
-  }
-
-  async findUserRoles(id: number): Promise<UserInterface> {
-    try {
-      const user = await this.usersRepository.findOneOrFail({
-        where: { id },
-        relations: ['roles'],
-      });
       return user;
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
@@ -76,7 +83,7 @@ export class UsersService {
         where: { id },
         select: ['password', 'email', 'username'],
       });
-      if (!user || !password || !user.checkPassword(password)) {
+      if (!user || !password || !(await user.checkPassword(password))) {
         throw new UnauthorizedException('Estas credenciais estão incorretas.');
       }
     } catch (error) {
@@ -84,11 +91,49 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async create(data: CreateUserDto): Promise<{ user: UserInterface; message: string }> {
+    try {
+      const entity: UserEntity = Object.assign(new UserEntity(), data);
+      const user: UserWithPasswordsInterface = await this.usersRepository.save(entity);
+      this.removePasswords(user);
+      return { user, message: 'O usuário foi criado com sucesso.' };
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível criar esse usuário.' }, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(
+    id: number,
+    currentUser: AuthUserInterface,
+    data: UpdateUserDto,
+  ): Promise<{ user: UserInterface; message: string }> {
+    if (!this.checkRole.isAdmin(currentUser) && currentUser.id !== id) {
+      throw new UnauthorizedException({ message: 'Você não possue autorização para editar esse usuário.' });
+    }
+    try {
+      const entity: UserEntity = Object.assign(new UserEntity(), { ...data, id });
+      await this.usersRepository.save(entity);
+      const user = await this.findOne(id);
+      return { user, message: 'O usuário foi atualizado com sucesso.' };
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível atualizar o usuário.' }, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async remove(id: number, currentUser: AuthUserInterface): Promise<{ message: string }> {
+    if (!this.checkRole.isAdmin(currentUser) && currentUser.id !== id) {
+      throw new UnauthorizedException({ message: 'Você não possue autorização para excluir esse usuário.' });
+    }
+    try {
+      await this.usersRepository.softDelete(id);
+      return { message: 'Usuário excluído com sucesso!' };
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível excluir o usuário' }, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  removePasswords(user: UserWithPasswordsInterface): void {
+    delete user.password;
+    delete user.confirmPassword;
   }
 }
