@@ -4,6 +4,7 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { RoleInterface } from 'src/modules/roles/interfaces/role.interface';
 import { UserInterface } from 'src/modules/users/interfaces/user.interface';
+import { AuthUserInterface } from './interfaces/auth-user.interface';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -11,13 +12,13 @@ export class AuthenticationController {
 
   @Public()
   @Post('login')
-  signIn(@Body() data: SignInDto) {
-    return this.authService.signIn(data.email, data.password);
+  async signIn(@Body() data: SignInDto): Promise<AuthUserInterface> {
+    return await this.authService.signIn(data.email, data.password);
   }
 
   @Public()
   @Post('make-token')
-  makeToken(@Body() data: UserInterface & { currentRole: RoleInterface }) {
+  makeToken(@Body() data: UserInterface): { access_token: string } {
     return this.authService.makeToken(data);
   }
 }

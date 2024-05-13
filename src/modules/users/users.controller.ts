@@ -8,6 +8,7 @@ import { Role } from 'src/shared/enum/role';
 import { UserInterface } from './interfaces/user.interface';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -29,19 +30,24 @@ export class UsersController {
   async findOne(@Param('id') id: string): Promise<UserInterface> {
     return await this.usersService.findOne(+id);
   }
-  
+
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Public()
+  async create(@Body() data: CreateUserDto): Promise<{ user: UserInterface; message: string }> {
+    return await this.usersService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: AuthUserInterface,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<{ user: UserInterface; message: string }> {
+    return await this.usersService.update(+id, currentUser, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string, @CurrentUser() currentUser: AuthUserInterface) {
+    return await this.usersService.remove(+id, currentUser);
   }
 }

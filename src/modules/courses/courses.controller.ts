@@ -36,6 +36,12 @@ export class CoursesController {
     return await this.coursesService.findOne(+id);
   }
 
+  @Roles(Role.Admin)
+  @Get('user/:id')
+  async findByUserId(@Param('id', ParseIntPipe) userId: number): Promise<CourseInterface[]> {
+    return await this.coursesService.findByUserId(+userId);
+  }
+
   @CreateCourseDocs()
   @Post()
   @Roles(Role.Business)
@@ -56,9 +62,7 @@ export class CoursesController {
   @DeleteCourseDocs()
   @Delete(':id')
   @Roles(Role.Business)
-  async remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string }> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.coursesService.remove(+id);
   }
 }

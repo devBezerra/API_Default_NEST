@@ -25,10 +25,19 @@ export class CoursesService {
     try {
       return await this.courseRepository.findOneOrFail({
         where: { id },
+        select: { user: { username: true } },
         relations: ['user'],
       });
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar o curso.' }, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async findByUserId(userId: number): Promise<CourseInterface[]> {
+    try {
+      return await this.courseRepository.find({ where: { userId } });
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar os cursos deste usuário.' }, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -41,7 +50,6 @@ export class CoursesService {
           id: Not(id),
           deletedAt: null,
         },
-        select: ['description'],
       });
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar o curso.' }, HttpStatus.NOT_FOUND);
@@ -64,7 +72,7 @@ export class CoursesService {
       const entity: CourseEntity = Object.assign(new CourseEntity(), { ...data, id });
       await this.courseRepository.save(entity);
 
-      const course = await this.courseRepository.findOne({ where: { id } });
+      const course = await this.findOne(id);
       return { course, message: 'O curso foi atualizado com sucesso.' };
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível atualizar o curso.' }, HttpStatus.BAD_REQUEST);
