@@ -104,12 +104,8 @@ export class UsersService {
 
   async update(
     id: number,
-    currentUser: AuthUserInterface,
     data: UpdateUserDto,
   ): Promise<{ user: UserInterface; message: string }> {
-    if (!this.checkRole.isAdmin(currentUser) && currentUser.id !== id) {
-      throw new UnauthorizedException({ message: 'Você não possue autorização para editar esse usuário.' });
-    }
     try {
       const entity: UserEntity = Object.assign(new UserEntity(), { ...data, id });
       await this.usersRepository.save(entity);
@@ -120,10 +116,7 @@ export class UsersService {
     }
   }
 
-  async remove(id: number, currentUser: AuthUserInterface): Promise<{ message: string }> {
-    if (!this.checkRole.isAdmin(currentUser) && currentUser.id !== id) {
-      throw new UnauthorizedException({ message: 'Você não possue autorização para excluir esse usuário.' });
-    }
+  async remove(id: number): Promise<{ message: string }> {
     try {
       await this.usersRepository.softDelete(id);
       return { message: 'Usuário excluído com sucesso!' };
