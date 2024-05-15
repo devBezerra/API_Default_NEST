@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,6 +9,7 @@ import { UserInterface } from './interfaces/user.interface';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
 import { Public } from 'src/decorators/public.decorator';
+import { AdminOrUserGuard } from 'src/common/admin-or-user.guard';
 
 @Controller('users')
 export class UsersController {
@@ -38,16 +39,17 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @UseGuards(AdminOrUserGuard)
   async update(
     @Param('id') id: string,
-    @CurrentUser() currentUser: AuthUserInterface,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<{ user: UserInterface; message: string }> {
-    return await this.usersService.update(+id, currentUser, updateUserDto);
+    return await this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @CurrentUser() currentUser: AuthUserInterface) {
-    return await this.usersService.remove(+id, currentUser);
+  @UseGuards(AdminOrUserGuard)
+  async remove(@Param('id') id: string) {
+    return await this.usersService.remove(+id);
   }
 }
