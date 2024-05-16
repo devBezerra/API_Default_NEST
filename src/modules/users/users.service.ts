@@ -27,15 +27,18 @@ export class UsersService {
     try {
       const entitie = this.usersRepository
         .createQueryBuilder('u')
-        .select(['u', 'c.id', 'c.description', 'rg.id', 'rgc.id', 'rgc.description'])
+        .select(['u', 'c.id', 'c.description', 'rg.id', 'rgc.id', 'rgc.description', 'r'])
         .leftJoin('u.courses', 'c', 'c.user_id = u.id')
         .leftJoin('u.registrations', 'rg', 'rg.user_id = u.id')
         .leftJoin('rg.course', 'rgc', 'rg.course_id = rgc.id')
+        .leftJoin('u.users_roles', 'p', 'p.user_id = u.id')
+        .leftJoin('p.role', 'r', 'r.id = p.role_id')
         .where('u.id = :id', { id });
 
       const user: UserInterface = await entitie.getOneOrFail();
       return user;
     } catch (error) {
+      console.log(error)
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
     }
   }
