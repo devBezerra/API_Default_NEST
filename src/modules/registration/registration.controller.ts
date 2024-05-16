@@ -1,39 +1,62 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/shared/enum/role';
+import { AdminOrUserGuard } from 'src/common/admin-or-user.guard';
+import { RegistrationInterface } from './interfaces/registration.interface';
+import { YourRegistrationGuard } from 'src/common/your-registration.guard';
+import { RegistrationUserCourseExistsPipe } from './pipes/registration-user-course-exists.pipe';
+import { RegistrationIdExistsPipe } from './pipes/registration-id-exists.pipe';
 
 @Controller('registration')
 export class RegistrationController {
   constructor(private readonly registrationService: RegistrationService) {}
 
   @Get()
-  findAll() {
-    return this.registrationService.findAll();
+  @Roles(Role.Admin)
+  async findAll(): Promise<RegistrationInterface[]> {
+    return await this.registrationService.findAll();
   }
 
   @Get('user/:id')
-  async findByUser(@Param('id') id: number){
-    return await this.registrationService.findByUserId(+id);
+  @Roles(Role.Admin, Role.Student)
+  @UseGuards(AdminOrUserGuard)
+  async findByUser(@Param('id', ParseIntPipe) userId: number): Promise<RegistrationInterface[]> {
+    return await this.registrationService.findByUserId(+userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.registrationService.findOne(+id);
+  @Roles(Role.Admin, Role.Student)
+  @UseGuards(YourRegistrationGuard)
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<RegistrationInterface> {
+    return await this.registrationService.findOne(+id);
   }
 
   @Post()
-  create(@Body() createRegistrationDto: CreateRegistrationDto) {
-    return this.registrationService.create(createRegistrationDto);
+  @Roles(Role.Admin, Role.Student)
+  @UseGuards(AdminOrUserGuard)
+  async create(
+    @Body(RegistrationUserCourseExistsPipe) data: CreateRegistrationDto,
+  ): Promise<{ registration: RegistrationInterface; message: string }> {
+    return await this.registrationService.create(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRegistrationDto: UpdateRegistrationDto) {
-    return this.registrationService.update(+id, updateRegistrationDto);
+  @Roles(Role.Admin, Role.Student)
+  @UseGuards(YourRegistrationGuard)
+  async update(
+    @Param('id', ParseIntPipe, RegistrationIdExistsPipe) id: number,
+    @Body() data: UpdateRegistrationDto,
+  ): Promise<{ registration: RegistrationInterface; message: string }> {
+    return await this.registrationService.update(+id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.registrationService.remove(+id);
+  @Roles(Role.Admin, Role.Student)
+  @UseGuards(YourRegistrationGuard)
+  async remove(@Param('id', ParseIntPipe, RegistrationIdExistsPipe) id: number): Promise<{ message: string }> {
+    return await this.registrationService.remove(+id);
   }
 }

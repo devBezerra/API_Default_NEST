@@ -10,7 +10,7 @@ export class AdminOrUserGuard implements CanActivate {
     const currentUser: UserInterface = context.switchToHttp().getRequest().user;
     const id: number = context.switchToHttp().getRequest().params.id;
     const userId: number = context.switchToHttp().getRequest().body.userId;
-    console.log(currentUser.id)
+
     if (!this.checkRole.isAdmin(currentUser) && currentUser.id !== +id && currentUser.id !== +userId) {
       throw new UnauthorizedException({ message: 'Você não possue autorização para realizar essa ação.' });
     }
