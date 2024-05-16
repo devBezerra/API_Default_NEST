@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Not, Repository } from 'typeorm';
 import { AuthUserInterface } from 'src/authentication/interfaces/auth-user.interface';
-import { CheckRole } from 'src/shared/utils/check-role.util';
 import { UserWithPasswordsInterface } from './interfaces/user-with-password.interface';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
-    private checkRole: CheckRole,
   ) {}
 
   async findAll(): Promise<UserInterface[]> {

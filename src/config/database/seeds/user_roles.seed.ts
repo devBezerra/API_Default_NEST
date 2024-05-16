@@ -11,7 +11,6 @@ export class UsersRolesSeed implements Seeder {
         (2, 2, 2),
         (3, 3, 3);
         `;
-      console.log(query)
     await dataSource.query(query);
   }
 }
