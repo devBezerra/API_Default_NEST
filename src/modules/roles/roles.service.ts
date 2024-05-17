@@ -4,13 +4,31 @@ import { ProfileEntity } from './entities/profile.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
+import { RoleInterface } from './interfaces/role.interface';
+import { RoleEntity } from './entities/role.entity';
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectRepository(ProfileEntity)
     private readonly profileRepository: Repository<ProfileEntity>,
+
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
   ) {}
+
+  async findAll(): Promise<RoleInterface[]> {
+    try {
+      return await this.roleRepository.find({
+        select: {
+          id: true,
+          name: true,
+        }
+      });
+    } catch (error) {
+      throw new HttpException({ message: 'Não foi possível encontrar os papeis do sistema.' }, HttpStatus.NOT_FOUND);
+    }
+  }
 
   async createProfile(data: CreateProfileDto): Promise<{ profile: ProfileInterface; message: string }> {
     try {
@@ -19,7 +37,6 @@ export class RolesService {
 
       return { profile, message: 'O perfil foi criada com sucesso.' };
     } catch (error) {
-      console.log(error)
       throw new HttpException({ message: 'Não foi possível criar o perfil.' }, HttpStatus.BAD_REQUEST);
     }
   }

@@ -27,18 +27,17 @@ export class UsersService {
     try {
       const entitie = this.usersRepository
         .createQueryBuilder('u')
-        .select(['u', 'c.id', 'c.description', 'rg.id', 'rgc.id', 'rgc.description', 'r'])
+        .select(['u', 'c.id', 'c.description', 'rg.id', 'rgc.id', 'rgc.description', 'p', 'r.id', 'r.name'])
         .leftJoin('u.courses', 'c', 'c.user_id = u.id')
         .leftJoin('u.registrations', 'rg', 'rg.user_id = u.id')
         .leftJoin('rg.course', 'rgc', 'rg.course_id = rgc.id')
-        .leftJoin('u.users_roles', 'p', 'p.user_id = u.id')
+        .leftJoin('u.profiles', 'p', 'p.user_id = u.id ')
         .leftJoin('p.role', 'r', 'r.id = p.role_id')
         .where('u.id = :id', { id });
 
       const user: UserInterface = await entitie.getOneOrFail();
       return user;
     } catch (error) {
-      console.log(error)
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
     }
   }
@@ -59,11 +58,14 @@ export class UsersService {
 
   async findUserByEmailLogin(email: string): Promise<UserInterface> {
     try {
-      const user = await this.usersRepository.findOneOrFail({
-        where: { email, deletedAt: null },
-        relations: ['roles'],
-      });
+      const entitie = this.usersRepository
+      .createQueryBuilder('u')
+      .select(['u', 'p', 'r'])
+      .leftJoin('u.profiles', 'p', 'p.user_id = u.id ')
+      .leftJoin('p.role', 'r', 'r.id = p.role_id')
+      .where('u.email = :email', { email });
 
+      const user: UserInterface = await entitie.getOneOrFail();
       return user;
     } catch (error) {
       throw new HttpException({ message: 'Não foi possível encontrar esse usuário.' }, HttpStatus.NOT_FOUND);
@@ -103,10 +105,7 @@ export class UsersService {
     }
   }
 
-  async update(
-    id: number,
-    data: UpdateUserDto,
-  ): Promise<{ user: UserInterface; message: string }> {
+  async update(id: number, data: UpdateUserDto): Promise<{ user: UserInterface; message: string }> {
     try {
       const entity: UserEntity = Object.assign(new UserEntity(), { ...data, id });
       await this.usersRepository.save(entity);

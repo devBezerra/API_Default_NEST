@@ -2,7 +2,6 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { SignInDto } from './dtos/sign-in.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { RoleInterface } from 'src/modules/roles/interfaces/role.interface';
 import { UserInterface } from 'src/modules/users/interfaces/user.interface';
 import { AuthUserInterface } from './interfaces/auth-user.interface';
 
