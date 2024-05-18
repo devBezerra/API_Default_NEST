@@ -1,14 +1,14 @@
-import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ProfileEntity } from './profile.entity';
+import { UserEntity } from 'src/modules/users/entities/user.entity';
 
 @Entity({ name: 'roles' })
 export class RoleEntity {
@@ -18,19 +18,8 @@ export class RoleEntity {
   @Column()
   name: string;
 
-  @ManyToMany(() => UserEntity)
-  @JoinTable({
-    name: 'users_roles',
-    joinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'role_id',
-      referencedColumnName: 'id',
-    },
-  })
-  users: UserEntity[];
+  @OneToMany(() => ProfileEntity, (profile) => profile.role)
+  profiles?: ProfileEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;

@@ -1,19 +1,17 @@
 import { CourseEntity } from 'src/modules/courses/entities/course.entity';
 import { RegistrationEntity } from 'src/modules/registration/entities/registration.entity';
-import { RoleEntity } from 'src/modules/roles/entities/role.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   BeforeInsert,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { ProfileEntity } from 'src/modules/roles/entities/profile.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -29,19 +27,8 @@ export class UserEntity {
   @Column({ select: false })
   password?: string;
 
-  @ManyToMany(() => RoleEntity)
-  @JoinTable({
-    name: 'users_roles',
-    joinColumn: {
-      name: 'role_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'user_id',
-      referencedColumnName: 'id',
-    },
-  })
-  roles?: RoleEntity[];
+  @OneToMany(() => ProfileEntity, (profile) => profile.user)
+  profiles?: ProfileEntity[];
 
   @OneToMany(() => CourseEntity, (course) => course.user)
   courses?: CourseEntity[];
