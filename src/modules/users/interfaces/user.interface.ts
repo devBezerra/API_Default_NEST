@@ -1,8 +1,9 @@
-import { RoleInterface } from "src/modules/roles/interfaces/role.interface";
+import { ProfileInterface } from "src/modules/roles/interfaces/profile.interface";
 
 export interface UserInterface {
   id: number;
   username: string;
   email: string;
-  currentRole?: RoleInterface;
+  currentProfile?: ProfileInterface;
+  profiles?: ProfileInterface[];
 }

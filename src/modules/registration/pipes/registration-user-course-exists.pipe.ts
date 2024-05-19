@@ -11,9 +11,9 @@ export class RegistrationUserCourseExistsPipe implements PipeTransform<any> {
     private readonly registrationRepository: Repository<RegistrationEntity>,
   ) {}
 
-  async transform(data: any): Promise<void> {
+  async transform(data: any): Promise<any> {
     try {
-      const registration: RegistrationInterface = await this.registrationRepository.findOneOrFail({
+      const registration: RegistrationInterface = await this.registrationRepository.findOne({
         where: {
           userId: data.userId,
           courseId: data.courseId,
@@ -26,5 +26,6 @@ export class RegistrationUserCourseExistsPipe implements PipeTransform<any> {
     } catch (error) {
       throw error;
     }
+    return data;
   }
 }
