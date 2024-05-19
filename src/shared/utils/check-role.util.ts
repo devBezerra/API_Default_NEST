@@ -17,4 +17,12 @@ export class CheckRole {
 
     return !!student
   }
+
+  containsBusiness(user: UserInterface): boolean {
+    const business = user.profiles.find((profile) => {
+      return profile.role.name === 'Business'
+    })
+
+    return !!business
+  }
 }

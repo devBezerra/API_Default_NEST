@@ -14,6 +14,7 @@ import { DeleteCourseDocs } from 'src/shared/docs/courses/courses-delete.docs';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/shared/enum/role';
 import { AuthGuard } from 'src/common/auth.guard';
+import { UserContainsBusinessProfilePipe } from './pipes/user-contains-business-profile.pipe';
 
 @ApiTags('Cursos')
 @Controller('courses')
@@ -42,14 +43,14 @@ export class CoursesController {
 
   @CreateCourseDocs()
   @Post()
-  @Roles(Role.Business)
-  async create(@Body() data: CreateCourseDto): Promise<{ course: CourseInterface; message: string }> {
+  @Roles(Role.Admin, Role.Business)
+  async create(@Body(UserContainsBusinessProfilePipe) data: CreateCourseDto): Promise<{ course: CourseInterface; message: string }> {
     return await this.coursesService.create(data);
   }
 
   @UpdateCourseDocs()
   @Patch(':id')
-  @Roles(Role.Business)
+  @Roles(Role.Admin, Role.Business)
   async update(
     @Body() data: UpdateCourseDto,
     @Param('id', ParseIntPipe) id: number,
@@ -59,7 +60,7 @@ export class CoursesController {
 
   @DeleteCourseDocs()
   @Delete(':id')
-  @Roles(Role.Business)
+  @Roles(Role.Admin, Role.Business)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
     return this.coursesService.remove(+id);
   }

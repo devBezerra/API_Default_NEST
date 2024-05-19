@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength, Validate } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, MaxLength, MinLength, Validate } from 'class-validator';
 import { CourseDescriptionAlreadyExists } from '../validate/course-name-already-exists.constraint';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -24,4 +24,8 @@ export class CreateCourseDto {
   @MinLength(3, { message: 'O campo de ementa precisa ter pelo menos 3 caracteres.' })
   @MaxLength(1000, { message: 'O campo de ementa pode ter no máximo 1000 caracteres.' })
   syllabus: string;
+
+  @IsNumber({}, { message: 'O campo de id de usuário precisa ser um número.' })
+  @IsNotEmpty({ message: 'O campo de id de usuário é obrigatório.' })
+  userId: number;
 }
