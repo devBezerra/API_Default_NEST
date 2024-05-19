@@ -26,7 +26,7 @@ export class AuthenticationService {
   }
 
   makeToken(data: UserInterface): { access_token: string } {
-    const payload = { id: data.id, username: data.username, currentRole: data.currentRole };
+    const payload = { id: data.id, username: data.username, currentProfile: data.currentProfile };
 
     return {
       access_token: this.jwtService.sign(payload),

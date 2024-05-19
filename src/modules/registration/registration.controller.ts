@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UsePipes } from '@nestjs/common';
 import { RegistrationService } from './registration.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
@@ -9,6 +9,7 @@ import { RegistrationInterface } from './interfaces/registration.interface';
 import { YourRegistrationGuard } from 'src/common/your-registration.guard';
 import { RegistrationUserCourseExistsPipe } from './pipes/registration-user-course-exists.pipe';
 import { RegistrationIdExistsPipe } from './pipes/registration-id-exists.pipe';
+import { UserContainsStudentProfilePipe } from './pipes/user-contains-student-profile.pipe';
 
 @Controller('registration')
 export class RegistrationController {
@@ -37,8 +38,9 @@ export class RegistrationController {
   @Post()
   @Roles(Role.Admin, Role.Student)
   @UseGuards(AdminOrUserGuard)
+  @UsePipes(UserContainsStudentProfilePipe, RegistrationUserCourseExistsPipe)
   async create(
-    @Body(RegistrationUserCourseExistsPipe) data: CreateRegistrationDto,
+    @Body() data: CreateRegistrationDto,
   ): Promise<{ registration: RegistrationInterface; message: string }> {
     return await this.registrationService.create(data);
   }
