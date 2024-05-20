@@ -1,3 +1,4 @@
+import { ClassEntity } from 'src/modules/classes/entities/class.entity';
 import { UserEntity } from 'src/modules/users/entities/user.entity';
 import {
   Column,
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -27,6 +29,9 @@ export class CourseEntity {
   @ManyToOne(() => UserEntity, (user) => user.courses)
   @JoinColumn({ name: 'user_id' })
   user?: UserEntity;
+
+  @OneToMany(() => ClassEntity, (classroom) => classroom.course)
+  classes?: ClassEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
