@@ -1,24 +1,32 @@
+import { CourseEntity } from 'src/modules/courses/entities/course.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProfileEntity } from './profile.entity';
 
-@Entity({ name: 'roles' })
-export class RoleEntity {
+@Entity({ name: 'classes' })
+export class ClassEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  name: string;
+  title: string;
 
-  @OneToMany(() => ProfileEntity, (profile) => profile.role)
-  profiles?: ProfileEntity[];
+  @Column({ name: 'course_id' })
+  courseId: number;
+
+  @Column()
+  url: string;
+
+  @ManyToOne(() => CourseEntity, (course) => course.classes)
+  @JoinColumn({ name: 'course_id' })
+  course?: CourseEntity;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
