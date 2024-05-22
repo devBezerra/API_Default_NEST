@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, UsePipes } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -15,6 +15,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/shared/enum/role';
 import { AuthGuard } from 'src/common/auth.guard';
 import { UserContainsBusinessProfilePipe } from './pipes/user-contains-business-profile.pipe';
+import { CourseIdExistPipe } from './pipes/course-id-exists.pipe';
 
 @ApiTags('Cursos')
 @Controller('courses')
@@ -31,29 +32,33 @@ export class CoursesController {
 
   @FindOneCourseDocs()
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<CourseInterface> {
+  @UsePipes(ParseIntPipe)
+  async findOne(@Param('id') id: number): Promise<CourseInterface> {
     return await this.coursesService.findOne(+id);
   }
 
-  @Roles(Role.Admin)
   @Get('user/:id')
-  async findByUserId(@Param('id', ParseIntPipe) userId: number): Promise<CourseInterface[]> {
+  @Roles(Role.Admin)
+  @UsePipes(ParseIntPipe)
+  async findByUserId(@Param('id') userId: number): Promise<CourseInterface[]> {
     return await this.coursesService.findByUserId(+userId);
   }
 
   @CreateCourseDocs()
   @Post()
   @Roles(Role.Admin, Role.Business)
-  async create(@Body(UserContainsBusinessProfilePipe) data: CreateCourseDto): Promise<{ course: CourseInterface; message: string }> {
+  @UsePipes(UserContainsBusinessProfilePipe)
+  async create(@Body() data: CreateCourseDto): Promise<{ course: CourseInterface; message: string }> {
     return await this.coursesService.create(data);
   }
 
   @UpdateCourseDocs()
   @Patch(':id')
   @Roles(Role.Admin, Role.Business)
+  @UsePipes(ParseIntPipe, CourseIdExistPipe)
   async update(
     @Body() data: UpdateCourseDto,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: number,
   ): Promise<{ course: CourseInterface; message: string }> {
     return this.coursesService.update(+id, data);
   }
@@ -61,7 +66,8 @@ export class CoursesController {
   @DeleteCourseDocs()
   @Delete(':id')
   @Roles(Role.Admin, Role.Business)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+  @UsePipes(ParseIntPipe, CourseIdExistPipe)
+  async remove(@Param('id') id: number): Promise<{ message: string }> {
     return this.coursesService.remove(+id);
   }
 }

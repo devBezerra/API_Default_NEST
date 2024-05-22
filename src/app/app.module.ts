@@ -5,8 +5,17 @@ import { DatabaseModule } from 'src/providers/database/database.module';
 import { UsersModule } from 'src/modules/users/users.module';
 import { RegistrationModule } from 'src/modules/registration/registration.module';
 import { RolesModule } from 'src/modules/roles/roles.module';
+import { ClassesModule } from 'src/modules/classes/classes.module';
 
 @Module({
-  imports: [DatabaseModule, AuthenticationModule, CoursesModule, UsersModule, RegistrationModule, RolesModule],
+  imports: [
+    DatabaseModule,
+    AuthenticationModule,
+    CoursesModule,
+    UsersModule,
+    RegistrationModule,
+    RolesModule,
+    ClassesModule,
+  ],
 })
 export class AppModule {}

@@ -18,11 +18,11 @@ export class ClassEntity {
   @Column()
   title: string;
 
-  @Column({ name: 'course_id' })
-  courseId: number;
-
   @Column()
   url: string;
+
+  @Column({ name: 'course_id' })
+  courseId: number;
 
   @ManyToOne(() => CourseEntity, (course) => course.classes)
   @JoinColumn({ name: 'course_id' })
